@@ -1,16 +1,14 @@
-import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:dio/dio.dart';
 import 'package:talk_ai/domain/entities/message_entity.dart';
 import 'package:talk_ai/domain/entities/system_message_entity.dart';
 import 'package:talk_ai/domain/entities/user_message_entity.dart';
-
-part 'key.dart';
 
 class SendMessageRepositoryImpl {
   static const _systemMessage = SystemMessageEntity(
       message:
           "Aja como se fosse um terapeuta em uma sessão, mas não minta sobre o que você é caso te perguntem. Sempre tente continuar a conversa a menos que o usuário termine a conversa verbalmente.");
   Future<String> call(List<MessageEntity> messageList) async {
+    const key = String.fromEnvironment('CHAT_API_KEY');
     var messages = _messagesToAPI(messageList);
     var body = <String, dynamic>{
       "model": "gpt-3.5-turbo",
@@ -21,7 +19,7 @@ class SendMessageRepositoryImpl {
       data: body,
       options: Options(
         headers: <String, String>{
-          'Authorization': 'Bearer $_key',
+          'Authorization': 'Bearer $key',
         },
       ),
     );
