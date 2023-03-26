@@ -2,13 +2,13 @@ import 'package:talk_ai/domain/entities/homePageStates/home_page_state.dart';
 
 class IdleHomePageState extends HomePageState {
   const IdleHomePageState({
-    required super.messages,
+    required super.messageList,
   });
 
-  const IdleHomePageState.initial() : super(messages: const []);
+  const IdleHomePageState.initial() : super(messageList: const []);
 
   factory IdleHomePageState.fromState(HomePageState state) {
-    return IdleHomePageState(messages: state.messages);
+    return IdleHomePageState(messageList: state.messageList);
   }
 
   @override

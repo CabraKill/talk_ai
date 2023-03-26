@@ -2,23 +2,23 @@ import 'package:equatable/equatable.dart';
 import 'package:talk_ai/domain/entities/message_entity.dart';
 
 class HomePageState extends Equatable {
-  final List<MessageEntity> messages;
+  final List<MessageEntity> messageList;
   const HomePageState({
-    required this.messages,
+    required this.messageList,
   });
 
   HomePageState addMessage(MessageEntity message) {
-    return copyWith(messages: [
-      ...messages,
+    return copyWith(messageList: [
+      ...messageList,
       message,
     ]);
   }
 
   HomePageState copyWith({
-    List<MessageEntity>? messages,
+    List<MessageEntity>? messageList,
   }) {
     return HomePageState(
-      messages: messages ?? this.messages,
+      messageList: messageList ?? this.messageList,
     );
   }
 
@@ -27,5 +27,5 @@ class HomePageState extends Equatable {
   }
 
   @override
-  List<Object> get props => [messages];
+  List<Object> get props => [messageList];
 }

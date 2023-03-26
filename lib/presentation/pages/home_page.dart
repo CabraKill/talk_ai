@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rive/rive.dart';
 import 'package:talk_ai/domain/entities/homePageStates/idle_home_page_state.dart';
+import 'package:talk_ai/domain/entities/system_message_entity.dart';
+import 'package:talk_ai/domain/entities/user_message_entity.dart';
+import 'package:talk_ai/presentation/pages/home/widgets/bot_message.dart';
+import 'package:talk_ai/presentation/pages/home/widgets/user_message.dart';
 import 'package:talk_ai/presentation/pages/home_page_controller.dart';
 
 class HomePage extends StatefulWidget {
@@ -41,17 +45,33 @@ class _HomePageState extends State<HomePage> {
         child:
             Consumer<HomePageController>(builder: (context, controller, child) {
           final isReady = controller.state is IdleHomePageState;
+          final messageList = controller.state.messageList;
+
           return Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
+                  fit: messageList.isEmpty ? FlexFit.loose : FlexFit.tight,
                   child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: controller.state.messages
-                          .map((e) => Text(e.message))
-                          .toList(),
+                    reverse: true,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: messageList
+                            .map(
+                              (message) => message is UserMessageEntity
+                                  ? UserMessage(
+                                      message: message,
+                                    )
+                                  : BotMessage(
+                                      message: message,
+                                    ),
+                            )
+                            .toList(),
+                      ),
                     ),
                   ),
                 ),
@@ -68,7 +88,8 @@ class _HomePageState extends State<HomePage> {
                         enabled: isReady,
                         controller: controller.textController,
                         onChanged: controller.onChanged,
-                        onSubmitted: (_) => controller.onSendMessage(),
+                        onSubmitted: (_) => controller.onSendMessage(
+                            onError: _showErrorSnackBar),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -99,6 +120,14 @@ class _HomePageState extends State<HomePage> {
             ),
           );
         }),
+      ),
+    );
+  }
+
+  void _showErrorSnackBar(String? error) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Error: $error'),
       ),
     );
   }

@@ -69,14 +69,15 @@ class HomePageController extends ChangeNotifier {
     }
   }
 
-  void onSendMessage() {
+  void onSendMessage({Function(String message)? onError}) {
     var text = textController.text;
-    _sendMessageToAPI(text);
+    _sendMessageToAPI(text, onError: onError);
     textController.clear();
     _send();
   }
 
-  void _sendMessageToAPI(String message) async {
+  void _sendMessageToAPI(String message,
+      {Function(String message)? onError}) async {
     _updateState(
       newState: SendingMessageHomePageState.fromState(
         state.addMessage(
@@ -87,12 +88,13 @@ class HomePageController extends ChangeNotifier {
       ),
     );
     try {
-      final result = await _sendMessageRepositoryImpl(message);
+      final result = await _sendMessageRepositoryImpl(state.messageList);
       var botMessageEntity = BotMessageEntity(message: result);
       _updateMessage(botMessageEntity);
     } catch (e, s) {
       debugPrint(e.toString());
       debugPrintStack(stackTrace: s);
+      onError?.call(e.toString());
     }
   }
 
