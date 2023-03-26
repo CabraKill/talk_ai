@@ -16,16 +16,6 @@ class SendMessageRepositoryImpl {
       "model": "gpt-3.5-turbo",
       "messages": messages,
     };
-    final request = ChatCompleteText(messages: [
-      Map.of({"role": "user", "content": 'Olá!'})
-    ], maxToken: 200, model: kChatGptTurbo0301Model);
-
-    final openAI = OpenAI.instance.build(
-      token: _key,
-      baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),
-    );
-    final response = await openAI.onChatCompletion(request: request);
-    // return response?.choices.last.message.content ?? 'Não entendi';
     final result = await Dio().post(
       'https://api.openai.com/v1/chat/completions',
       data: body,
