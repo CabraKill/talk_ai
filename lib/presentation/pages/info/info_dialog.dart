@@ -10,7 +10,7 @@ class ChatGPTDialog extends StatefulWidget {
 class ChatGPTDialogState extends State<ChatGPTDialog>
     with SingleTickerProviderStateMixin {
   static const String _aboutAppText =
-      'Our app uses ChatGPT, a language model trained by OpenAI, to generate answers to your questions. It is instructed to act like a therapist, so it will try to answer your questions in a way that is similar to how a therapist would answer with focus of helping you with your problems.';
+      'TalkAI uses ChatGPT, a language model trained by OpenAI, to generate answers to your questions. It is instructed to act like a therapist, so it will try to answer your questions in a way that is similar to how a therapist would answer with focus of helping you with your problems. Your can write in your own language.';
 
   late final AnimationController _animationController;
   late final Animation<double> _animationAlign;
@@ -19,10 +19,10 @@ class ChatGPTDialogState extends State<ChatGPTDialog>
   void initState() {
     super.initState();
 
-    Future.delayed(const Duration(milliseconds: 300), () {
-      _animationController.forward();
-    });
+    _startAnimation();
+  }
 
+  void _startAnimation() {
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -35,6 +35,8 @@ class ChatGPTDialogState extends State<ChatGPTDialog>
       parent: _animationController,
       curve: Curves.easeOut,
     ));
+
+    _animationController.forward();
   }
 
   @override
@@ -58,7 +60,7 @@ class ChatGPTDialogState extends State<ChatGPTDialog>
             child: Material(
               color: Colors.transparent,
               child: Align(
-                alignment: Alignment(0, 2 - _animationAlign.value * 2),
+                alignment: Alignment(0, 2.5 - _animationAlign.value * 2.5),
                 child: Container(
                   width: double.infinity,
                   margin: const EdgeInsets.all(16.0),
@@ -79,7 +81,7 @@ class ChatGPTDialogState extends State<ChatGPTDialog>
                       Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          'About Our App',
+                          'About the App',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18.0,

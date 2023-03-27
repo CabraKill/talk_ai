@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:rive/rive.dart';
-import 'package:talk_ai/data/repositories/send_message_stream_repository_impl.dart';
+import 'package:talk_ai/data/repositories/send_message_stream_repository_impl.dart'
+    if (dart.library.html) 'package:talk_ai/data/repositories/send_message_repository_impl.dart';
+import 'package:talk_ai/domain/entities/bot_message_stream_entity.dart';
 import 'package:talk_ai/domain/entities/homePageStates/home_page_state.dart';
 import 'package:talk_ai/domain/entities/homePageStates/idle_home_page_state.dart';
 import 'package:talk_ai/domain/entities/homePageStates/receiving_message_home_page_state.dart';
@@ -17,8 +19,11 @@ class HomePageController extends ChangeNotifier {
 
   StateMachineController? _riveAnimationController;
 
-  final SendMessageStreamRepositoryImpl _sendMessageRepositoryImpl =
-      SendMessageStreamRepositoryImpl();
+  final SendMessageRepositoryImpl _sendMessageRepositoryImpl =
+      SendMessageRepositoryImpl();
+
+  String _lastMessageWritten = '';
+  bool _messageSent = false;
 
   void _updateState({
     HomePageState? newState,
@@ -30,32 +35,38 @@ class HomePageController extends ChangeNotifier {
   }
 
   void startMessaging() {
-    var trigger = (_riveAnimationController?.findInput<bool>('startMessaging')
+    final trigger = (_riveAnimationController?.findInput<bool>('startMessaging')
         as SMITrigger);
     trigger.fire();
   }
 
   void _startTyping() {
-    var trigger = (_riveAnimationController?.findInput<bool>('startTyping')
+    final trigger = (_riveAnimationController?.findInput<bool>('startTyping')
         as SMITrigger);
     trigger.fire();
   }
 
   void _send() {
-    var trigger = (_riveAnimationController?.findInput<bool>('sendMessage')
+    final trigger = (_riveAnimationController?.findInput<bool>('sendMessage')
         as SMITrigger);
     trigger.fire();
   }
 
+  void _playLoadingAnimation() {
+    final trigger =
+        (_riveAnimationController?.findInput<bool>('loading') as SMITrigger);
+    trigger.fire();
+  }
+
   void _removeMessage() {
-    var trigger = (_riveAnimationController?.findInput<bool>('removeMessage')
+    final trigger = (_riveAnimationController?.findInput<bool>('removeMessage')
         as SMITrigger);
     trigger.fire();
   }
 
   void onInit(Artboard artboard) {
     final stateMachineController =
-        StateMachineController.fromArtboard(artboard, 'State Machine 1');
+        StateMachineController.fromArtboard(artboard, 'State Machine 2');
     _riveAnimationController = stateMachineController;
     final riveController = _riveAnimationController;
     if (riveController != null) {
@@ -64,20 +75,26 @@ class HomePageController extends ChangeNotifier {
   }
 
   void onChanged(String value) {
-    if (value.isEmpty) {
-      _removeMessage();
-    } else {
+    if (value.contains("\n")) {
+      return;
+    }
+    if (value.length == 1 && (_lastMessageWritten.isEmpty || _messageSent)) {
       startMessaging();
+    } else if (value.isEmpty && !_messageSent) {
+      _removeMessage();
+    } else if (!_messageSent) {
       _startTyping();
     }
+    _messageSent = false;
+    _lastMessageWritten = value;
   }
 
   void onSendMessage({Function(String message)? onError}) {
     if (state is! IdleHomePageState) return;
+    _messageSent = true;
     var text = textController.text;
     _sendMessageToAPI(text, onError: onError);
     textController.clear();
-    _send();
   }
 
   void _sendMessageToAPI(
@@ -85,6 +102,28 @@ class HomePageController extends ChangeNotifier {
     Function(String message)? onError,
   }) async {
     final messageFormatted = message.trim();
+    _updateStateToSending(messageFormatted);
+    try {
+      final result = await _sendMessageRepositoryImpl(state.messageList);
+      _send();
+      if (result is BotMessageStreamEntity) {
+        _updateMessageToReceiving(result);
+        final streamResult = await result.messageStream.drain();
+        if (streamResult != null) {
+          onError?.call(streamResult.toString());
+        }
+        _updateStateToIdle();
+      } else {
+        _addMessage(result);
+      }
+    } catch (e, s) {
+      debugPrint(e.toString());
+      debugPrintStack(stackTrace: s);
+      onError?.call(e.toString());
+    }
+  }
+
+  void _updateStateToSending(String messageFormatted) {
     _updateState(
       newState: SendingMessageHomePageState.fromState(
         state.addMessage(
@@ -94,19 +133,12 @@ class HomePageController extends ChangeNotifier {
         ),
       ),
     );
-    try {
-      final result = await _sendMessageRepositoryImpl(state.messageList);
-      _updateMessageToReceiving(result);
-      final streamResult = await result.messageStream.drain();
-      if (streamResult != null) {
-        onError?.call(streamResult.toString());
-      }
-    } catch (e, s) {
-      debugPrint(e.toString());
-      debugPrintStack(stackTrace: s);
-      onError?.call(e.toString());
-    }
-    _updateStateToIdle();
+    _playLoadingAnimation();
+  }
+
+  void _addMessage(MessageEntity result) {
+    _updateState(
+        newState: IdleHomePageState.fromState(state.addMessage(result)));
   }
 
   void _updateMessageToReceiving(MessageEntity result) {

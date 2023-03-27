@@ -1,17 +1,17 @@
-import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:dio/dio.dart';
 import 'package:talk_ai/domain/entities/bot_message_stream_entity.dart';
 import 'package:talk_ai/domain/entities/message_entity.dart';
 import 'package:talk_ai/domain/entities/system_message_entity.dart';
 import 'package:talk_ai/domain/entities/user_message_entity.dart';
 
-class SendMessageStreamRepositoryImpl {
+class SendMessageRepositoryImpl {
   static const _systemMessage = SystemMessageEntity(
       message:
           "Aja como se fosse um terapeuta em uma sessão, mas não minta sobre o que você é caso te perguntem. Sempre tente continuar a conversa a menos que o usuário termine a conversa verbalmente.");
-  Future<BotMessageStreamEntity> call(List<MessageEntity> messageList) async {
+  static const _okStatusCode = 200;
+
+  Future<MessageEntity> call(List<MessageEntity> messageList) async {
     const key = String.fromEnvironment('CHAT_API_KEY');
     var messages = _messagesToAPI(messageList);
     var body = <String, dynamic>{
@@ -19,6 +19,7 @@ class SendMessageStreamRepositoryImpl {
       "messages": messages,
       "stream": true,
     };
+
     final result = await Dio().post(
       'https://api.openai.com/v1/chat/completions',
       data: body,
@@ -29,10 +30,11 @@ class SendMessageStreamRepositoryImpl {
         responseType: ResponseType.stream,
       ),
     );
-    if (result.statusCode != HttpStatus.ok) {
+    if (result.statusCode != _okStatusCode) {
       throw Exception('Failed to send message');
     }
-    var stream = (result.data.stream as Stream<Uint8List>).asBroadcastStream();
+    final stream =
+        (result.data.stream as Stream<Uint8List>).asBroadcastStream();
 
     return BotMessageStreamEntity(
       message: "",

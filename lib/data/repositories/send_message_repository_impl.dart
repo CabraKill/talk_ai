@@ -1,13 +1,17 @@
 import 'package:dio/dio.dart';
+import 'package:talk_ai/domain/entities/bot_message_entity.dart';
 import 'package:talk_ai/domain/entities/message_entity.dart';
 import 'package:talk_ai/domain/entities/system_message_entity.dart';
 import 'package:talk_ai/domain/entities/user_message_entity.dart';
+import 'package:talk_ai/infra/utils/get_message_from_api_chat_object_util.dart';
 
 class SendMessageRepositoryImpl {
   static const _systemMessage = SystemMessageEntity(
       message:
           "Aja como se fosse um terapeuta em uma sessão, mas não minta sobre o que você é caso te perguntem. Sempre tente continuar a conversa a menos que o usuário termine a conversa verbalmente.");
-  Future<String> call(List<MessageEntity> messageList) async {
+  static const _okStatusCode = 200;
+
+  Future<MessageEntity> call(List<MessageEntity> messageList) async {
     const key = String.fromEnvironment('CHAT_API_KEY');
     var messages = _messagesToAPI(messageList);
     var body = <String, dynamic>{
@@ -23,10 +27,13 @@ class SendMessageRepositoryImpl {
         },
       ),
     );
-    if (result.statusCode != 200) {
+    if (result.statusCode != _okStatusCode) {
       throw Exception('Failed to send message');
     }
-    return result.data['choices'][0]['message']['content'];
+
+    return BotMessageEntity(
+      message: getMessageFromApiChatObjectUtil(result.data),
+    );
   }
 
   List<Map<String, String>> _messagesToAPI(List<MessageEntity> messageList) {
@@ -37,6 +44,7 @@ class SendMessageRepositoryImpl {
                 _systemMessage,
                 ...messageList,
               ];
+
     return formattedMessageList.map(_convertMessageToRoleMessage).toList();
   }
 
@@ -46,6 +54,7 @@ class SendMessageRepositoryImpl {
         : message is SystemMessageEntity
             ? 'system'
             : 'assistant';
+
     return {
       'role': role,
       'content': message.message,
