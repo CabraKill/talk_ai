@@ -8,6 +8,7 @@ import 'package:talk_ai/presentation/pages/home/widgets/bot_message.dart';
 import 'package:talk_ai/presentation/pages/home/widgets/bot_message_stream_builder.dart';
 import 'package:talk_ai/presentation/pages/home/widgets/user_message.dart';
 import 'package:talk_ai/presentation/pages/home_page_controller.dart';
+import 'package:talk_ai/presentation/pages/info/info_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,12 +19,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static const double _pagePadding = 8.0;
+  static const double _fieldDimension = 52;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<HomePageController>().init();
     });
+    _showInfoDialogInStartUp();
   }
 
   @override
@@ -40,7 +44,13 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Page'),
+        title: const Text('TalkAi'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info),
+            onPressed: _showInfoDialog,
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.only(
@@ -85,45 +95,57 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: const InputDecoration(
-                          border: outlineInputBorder,
-                          focusedBorder: outlineInputBorder,
-                          enabledBorder: outlineInputBorder,
-                          labelText: 'Message',
+                IntrinsicHeight(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          decoration: const InputDecoration(
+                            border: outlineInputBorder,
+                            focusedBorder: outlineInputBorder,
+                            enabledBorder: outlineInputBorder,
+                            labelText: 'Message',
+                          ),
+                          maxLines: 5,
+                          minLines: 1,
+                          controller: controller.textController,
+                          onChanged: controller.onChanged,
+                          onSubmitted: (_) => controller.onSendMessage(
+                              onError: _showErrorSnackBar),
+                          textInputAction: TextInputAction.send,
                         ),
-                        controller: controller.textController,
-                        onChanged: controller.onChanged,
-                        onSubmitted: (_) => controller.onSendMessage(
-                            onError: _showErrorSnackBar),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    GestureDetector(
-                      onTap: isReady ? controller.onSendMessage : null,
-                      child: SizedBox.square(
-                        dimension: 52,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: isReady ? Colors.black : Colors.black38,
-                              width: 2,
+                      const SizedBox(width: 10),
+                      AspectRatio(
+                        aspectRatio: 1,
+                        child: GestureDetector(
+                          onTap: isReady ? controller.onSendMessage : null,
+                          child: Container(
+                            constraints: BoxConstraints(
+                              minWidth: _fieldDimension,
+                              minHeight: _fieldDimension,
                             ),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: RiveAnimation.asset(
-                            "assets/rive/chat.riv",
-                            fit: BoxFit.cover,
-                            artboard: "enterChat",
-                            onInit: controller.onInit,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color:
+                                      isReady ? Colors.black : Colors.black38,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: RiveAnimation.asset(
+                                "assets/rive/chat.riv",
+                                fit: BoxFit.cover,
+                                artboard: "enterChat",
+                                onInit: controller.onInit,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -138,6 +160,18 @@ class _HomePageState extends State<HomePage> {
       SnackBar(
         content: Text('Error: $error'),
       ),
+    );
+  }
+
+  void _showInfoDialogInStartUp() async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    _showInfoDialog();
+  }
+
+  void _showInfoDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => ChatGPTDialog(),
     );
   }
 }

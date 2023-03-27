@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -28,7 +29,7 @@ class SendMessageStreamRepositoryImpl {
         responseType: ResponseType.stream,
       ),
     );
-    if (result.statusCode != 200) {
+    if (result.statusCode != HttpStatus.ok) {
       throw Exception('Failed to send message');
     }
     var stream = (result.data.stream as Stream<Uint8List>).asBroadcastStream();

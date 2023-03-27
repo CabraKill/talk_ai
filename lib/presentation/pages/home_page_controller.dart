@@ -54,10 +54,13 @@ class HomePageController extends ChangeNotifier {
   }
 
   void onInit(Artboard artboard) {
-    _riveAnimationController =
-        StateMachineController.fromArtboard(artboard, 'State Machine 1')
-            as StateMachineController;
-    artboard.addController(_riveAnimationController!);
+    final stateMachineController =
+        StateMachineController.fromArtboard(artboard, 'State Machine 1');
+    _riveAnimationController = stateMachineController;
+    final riveController = _riveAnimationController;
+    if (riveController != null) {
+      artboard.addController(riveController);
+    }
   }
 
   void onChanged(String value) {
@@ -77,13 +80,16 @@ class HomePageController extends ChangeNotifier {
     _send();
   }
 
-  void _sendMessageToAPI(String message,
-      {Function(String message)? onError}) async {
+  void _sendMessageToAPI(
+    String message, {
+    Function(String message)? onError,
+  }) async {
+    final messageFormatted = message.trim();
     _updateState(
       newState: SendingMessageHomePageState.fromState(
         state.addMessage(
           UserMessageEntity(
-            message: message,
+            message: messageFormatted,
           ),
         ),
       ),
@@ -91,16 +97,16 @@ class HomePageController extends ChangeNotifier {
     try {
       final result = await _sendMessageRepositoryImpl(state.messageList);
       _updateMessageToReceiving(result);
-      final streamResult = await result.messageStream?.drain();
+      final streamResult = await result.messageStream.drain();
       if (streamResult != null) {
         onError?.call(streamResult.toString());
       }
-      _updateStateToIdle();
     } catch (e, s) {
       debugPrint(e.toString());
       debugPrintStack(stackTrace: s);
       onError?.call(e.toString());
     }
+    _updateStateToIdle();
   }
 
   void _updateMessageToReceiving(MessageEntity result) {

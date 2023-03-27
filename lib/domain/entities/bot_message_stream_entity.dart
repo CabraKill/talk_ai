@@ -10,15 +10,14 @@ class BotMessageStreamEntity implements MessageEntity {
 
   String latestMessage = '';
 
-  @override
-  final Stream<Uint8List>? messageStream;
+  final Stream<Uint8List> messageStream;
 
   BotMessageStreamEntity({
     required this.message,
-    this.messageStream,
+    required this.messageStream,
   }) {
     latestMessage = message;
-    messageStream?.listen(
+    messageStream.listen(
       _onStreamData,
       onDone: _onStreamDone,
       onError: _onErrorStream,
@@ -45,7 +44,9 @@ class BotMessageStreamEntity implements MessageEntity {
   }
 
   String _removeInitialDataTextInTheBeginning(String text) {
-    return text.substring(6).trim();
+    const start = 6;
+
+    return text.substring(start).trim();
   }
 
   String _convertBytesToString(Uint8List bytes) {
