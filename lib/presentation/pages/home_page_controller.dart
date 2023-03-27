@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:rive/rive.dart';
-import 'package:talk_ai/data/repositories/send_message_repository_impl.dart';
-import 'package:talk_ai/domain/entities/bot_message_entity.dart';
+import 'package:talk_ai/data/repositories/send_message_stream_repository_impl.dart';
 import 'package:talk_ai/domain/entities/homePageStates/home_page_state.dart';
 import 'package:talk_ai/domain/entities/homePageStates/idle_home_page_state.dart';
+import 'package:talk_ai/domain/entities/homePageStates/receiving_message_home_page_state.dart';
 import 'package:talk_ai/domain/entities/homePageStates/sending_message_home_page_state.dart';
 import 'package:talk_ai/domain/entities/message_entity.dart';
 import 'package:talk_ai/domain/entities/user_message_entity.dart';
@@ -17,8 +17,8 @@ class HomePageController extends ChangeNotifier {
 
   StateMachineController? _riveAnimationController;
 
-  final SendMessageRepositoryImpl _sendMessageRepositoryImpl =
-      SendMessageRepositoryImpl();
+  final SendMessageStreamRepositoryImpl _sendMessageRepositoryImpl =
+      SendMessageStreamRepositoryImpl();
 
   void _updateState({
     HomePageState? newState,
@@ -70,6 +70,7 @@ class HomePageController extends ChangeNotifier {
   }
 
   void onSendMessage({Function(String message)? onError}) {
+    if (state is! IdleHomePageState) return;
     var text = textController.text;
     _sendMessageToAPI(text, onError: onError);
     textController.clear();
@@ -89,8 +90,12 @@ class HomePageController extends ChangeNotifier {
     );
     try {
       final result = await _sendMessageRepositoryImpl(state.messageList);
-      var botMessageEntity = BotMessageEntity(message: result);
-      _updateMessage(botMessageEntity);
+      _updateMessageToReceiving(result);
+      final streamResult = await result.messageStream?.drain();
+      if (streamResult != null) {
+        onError?.call(streamResult.toString());
+      }
+      _updateStateToIdle();
     } catch (e, s) {
       debugPrint(e.toString());
       debugPrintStack(stackTrace: s);
@@ -98,9 +103,16 @@ class HomePageController extends ChangeNotifier {
     }
   }
 
-  void _updateMessage(MessageEntity result) {
+  void _updateMessageToReceiving(MessageEntity result) {
     _updateState(
-        newState: IdleHomePageState.fromState(state.addMessage(result)));
+        newState:
+            ReceivingMessageHomePageState.fromState(state.addMessage(result)));
+  }
+
+  void _updateStateToIdle() {
+    _updateState(
+      newState: IdleHomePageState.fromState(state),
+    );
   }
 
   void init() {
