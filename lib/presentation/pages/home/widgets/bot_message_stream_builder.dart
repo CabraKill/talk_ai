@@ -14,8 +14,7 @@ class BotMessageStreamBuilder extends StatelessWidget {
     return StreamBuilder(
       stream: message.messageStream,
       builder: (context, snap) {
-        final data = snap.data;
-        var messageText = message.latestMessage;
+        final messageText = message.message;
 
         return MessageContainer(
           message: messageText,

@@ -14,4 +14,6 @@ class AppColors {
     800: Color(0xFF747474),
     900: Color(0xFF747474)
   });
+
+  static const cyan = Color(0xFF31dada);
 }

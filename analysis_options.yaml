@@ -26,6 +26,7 @@ dart_code_metrics:
     - prefer_single_quotes
     - always_declare_return_types
     - prefer_final_in_for_each
+    - member-ordering
     - prefer-single-widget-per-file:
         ignore-private-widgets: true
     - avoid-unnecessary-setstate

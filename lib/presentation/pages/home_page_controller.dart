@@ -25,41 +25,8 @@ class HomePageController extends ChangeNotifier {
   String _lastMessageWritten = '';
   bool _messageSent = false;
 
-  void _updateState({
-    HomePageState? newState,
-  }) {
-    if (newState != null) {
-      state = newState;
-    }
-    notifyListeners();
-  }
-
   void startMessaging() {
     final trigger = (_riveAnimationController?.findInput<bool>('startMessaging')
-        as SMITrigger);
-    trigger.fire();
-  }
-
-  void _startTyping() {
-    final trigger = (_riveAnimationController?.findInput<bool>('startTyping')
-        as SMITrigger);
-    trigger.fire();
-  }
-
-  void _send() {
-    final trigger = (_riveAnimationController?.findInput<bool>('sendMessage')
-        as SMITrigger);
-    trigger.fire();
-  }
-
-  void _playLoadingAnimation() {
-    final trigger =
-        (_riveAnimationController?.findInput<bool>('loading') as SMITrigger);
-    trigger.fire();
-  }
-
-  void _removeMessage() {
-    final trigger = (_riveAnimationController?.findInput<bool>('removeMessage')
         as SMITrigger);
     trigger.fire();
   }
@@ -95,6 +62,35 @@ class HomePageController extends ChangeNotifier {
     var text = textController.text;
     _sendMessageToAPI(text, onError: onError);
     textController.clear();
+  }
+
+  void init() {
+    _updateState(
+      newState: const IdleHomePageState.initial(),
+    );
+  }
+
+  void onShareTap(MessageEntity botMessageEntity,
+      void Function(String userMessage, String botMessage) share) {
+    final messageList = state.messageList;
+
+    final indexOfBotMessage = messageList.indexOf(botMessageEntity);
+    final userMessageEntity = messageList[indexOfBotMessage - 1];
+    final botMessage = botMessageEntity.message;
+    var userMessage = userMessageEntity.message;
+    share(
+      userMessage,
+      botMessage,
+    );
+  }
+
+  void _updateState({
+    HomePageState? newState,
+  }) {
+    if (newState != null) {
+      state = newState;
+    }
+    notifyListeners();
   }
 
   void _sendMessageToAPI(
@@ -153,9 +149,27 @@ class HomePageController extends ChangeNotifier {
     );
   }
 
-  void init() {
-    _updateState(
-      newState: const IdleHomePageState.initial(),
-    );
+  void _startTyping() {
+    final trigger = (_riveAnimationController?.findInput<bool>('startTyping')
+        as SMITrigger);
+    trigger.fire();
+  }
+
+  void _send() {
+    final trigger = (_riveAnimationController?.findInput<bool>('sendMessage')
+        as SMITrigger);
+    trigger.fire();
+  }
+
+  void _playLoadingAnimation() {
+    final trigger =
+        (_riveAnimationController?.findInput<bool>('loading') as SMITrigger);
+    trigger.fire();
+  }
+
+  void _removeMessage() {
+    final trigger = (_riveAnimationController?.findInput<bool>('removeMessage')
+        as SMITrigger);
+    trigger.fire();
   }
 }

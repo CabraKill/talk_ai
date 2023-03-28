@@ -6,9 +6,7 @@ import 'package:talk_ai/infra/utils/get_message_from_api_chat_object_util.dart';
 
 class BotMessageStreamEntity implements MessageEntity {
   @override
-  final String message;
-
-  String latestMessage = '';
+  String message;
 
   final Stream<Uint8List> messageStream;
 
@@ -16,7 +14,6 @@ class BotMessageStreamEntity implements MessageEntity {
     required this.message,
     required this.messageStream,
   }) {
-    latestMessage = message;
     messageStream.listen(
       _onStreamData,
       onDone: _onStreamDone,
@@ -36,7 +33,7 @@ class BotMessageStreamEntity implements MessageEntity {
       final message = getMessageFromStreamApiChatObjectUtil(
         jsonDecode(decodedMessageFormatted),
       );
-      latestMessage += message;
+      this.message += message;
     } catch (e, s) {
       debugPrint("error: $e");
       debugPrint("stack: $s");

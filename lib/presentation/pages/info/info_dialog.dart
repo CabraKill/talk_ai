@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:talk_ai/presentation/pages/info/info_dialog_item_widget.dart';
 
 class ChatGPTDialog extends StatefulWidget {
   const ChatGPTDialog({Key? key}) : super(key: key);
@@ -9,8 +11,13 @@ class ChatGPTDialog extends StatefulWidget {
 
 class ChatGPTDialogState extends State<ChatGPTDialog>
     with SingleTickerProviderStateMixin {
-  static const String _aboutAppText =
-      'TalkAI uses ChatGPT, a language model trained by OpenAI, to generate answers to your questions. It is instructed to act like a therapist, so it will try to answer your questions in a way that is similar to how a therapist would answer with focus of helping you with your problems. Your can write in your own language.';
+  static const _instruction =
+      'Its goal is to act like a therapist, so it will try to answer your questions in a way that may sound similar to how a therapist would behave. The success here is helping you with your problems.';
+
+  static const _language = 'You can write in your own language.';
+  static const _data =
+      'TalkAI uses ChatGPT, a language model trained by OpenAI, to generate answers to your questions.';
+  static const double _maxDialogWidth = 600;
 
   late final AnimationController _animationController;
   late final Animation<double> _animationAlign;
@@ -20,6 +27,17 @@ class ChatGPTDialogState extends State<ChatGPTDialog>
     super.initState();
 
     _startAnimation();
+  }
+
+  double _getYAlignment(double animationValue) {
+    const bottomYAlignment = 2.5;
+
+    return bottomYAlignment - animationValue * bottomYAlignment;
+  }
+
+  void _exit(BuildContext context) {
+    _animationController.reverse();
+    Navigator.of(context).pop();
   }
 
   void _startAnimation() {
@@ -47,73 +65,56 @@ class ChatGPTDialogState extends State<ChatGPTDialog>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        _animationController.reverse();
-        Navigator.of(context).pop();
-      },
-      child: AnimatedBuilder(
-        animation: _animationController,
-        builder: (BuildContext context, Widget? child) {
-          return Align(
-            alignment: Alignment.bottomCenter,
-            child: Material(
-              color: Colors.transparent,
-              child: Align(
-                alignment: Alignment(0, 2.5 - _animationAlign.value * 2.5),
-                child: Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 16.0,
-                        spreadRadius: 4.0,
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          'About the App',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18.0,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          _aboutAppText,
-                          textAlign: TextAlign.justify,
-                        ),
-                      ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _animationController.reverse();
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('OK'),
-                        ),
-                      ),
-                    ],
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (BuildContext context, Widget? child) {
+        final animationValue = _animationAlign.value;
+        final yAlignment = _getYAlignment(animationValue);
+
+        return Dialog(
+          alignment: Alignment(0, yAlignment),
+          insetPadding: const EdgeInsets.all(16.0),
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: _maxDialogWidth,
+            ),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'About the App',
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
-              ),
+                InfoDialogItemWidget(
+                  iconData: FontAwesomeIcons.database,
+                  title: _data,
+                ),
+                InfoDialogItemWidget(
+                  iconData: FontAwesomeIcons.solidHeart,
+                  title: _instruction,
+                ),
+                InfoDialogItemWidget(
+                  iconData: FontAwesomeIcons.language,
+                  title: _language,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: 16,
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () => _exit(context),
+                    child: const Text('OK'),
+                  ),
+                ),
+              ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }
