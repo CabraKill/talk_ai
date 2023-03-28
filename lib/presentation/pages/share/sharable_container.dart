@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:talk_ai/infra/colors/colors.dart';
 import 'package:talk_ai/presentation/pages/home/widgets/bot_message.dart';
 import 'package:talk_ai/presentation/pages/home/widgets/user_message.dart';
 
@@ -15,20 +16,43 @@ class SharableContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: Dialog(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
+      child: Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Container(
+            constraints: const BoxConstraints(
+              maxWidth: 500,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                UserMessage(
-                  message: userMessage,
+                Flexible(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      UserMessage(
+                        message: userMessage,
+                      ),
+                      BotMessage(
+                        message: botMessage,
+                      )
+                    ],
+                  ),
                 ),
-                BotMessage(
-                  message: botMessage,
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text("TalkAI - https://cabrakill.github.io/talk_ai/",
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontStyle: FontStyle.italic,
+                              color: AppColors.cyan,
+                            )),
+                  ],
                 )
               ],
             ),

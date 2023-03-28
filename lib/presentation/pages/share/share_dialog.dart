@@ -43,6 +43,7 @@ class _ShareDialogState extends State<ShareDialog> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Dialog(
           child: Row(
@@ -59,14 +60,14 @@ class _ShareDialogState extends State<ShareDialog> {
         SizedBox(height: 16),
         Flexible(
           child: Container(
-            constraints: BoxConstraints(
-              maxHeight: 700,
-              maxWidth: 700,
-            ),
-            child: SharableContainer(
-              userMessage: widget.userMessage,
-              botMessage: widget.botMessage,
-              key: _globalKey,
+            width: MediaQuery.of(context).size.width * 0.8,
+            child: FittedBox(
+              fit: BoxFit.cover,
+              child: SharableContainer(
+                userMessage: widget.userMessage,
+                botMessage: widget.botMessage,
+                key: _globalKey,
+              ),
             ),
           ),
         ),

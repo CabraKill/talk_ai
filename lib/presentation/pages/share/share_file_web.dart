@@ -1,8 +1,29 @@
+import 'dart:convert';
 import 'dart:html' as html;
 import 'dart:js' as js;
 import 'package:flutter/foundation.dart';
 
 Future<void> shareFile(
+  ByteData imageBytes,
+) async {
+  final uint8ListFromBytes = imageBytes.buffer.asUint8List();
+  final base64 = base64Encode(uint8ListFromBytes);
+  final anchor =
+      html.AnchorElement(href: 'data:application/octet-stream;base64,$base64')
+        ..target = 'blank';
+
+  anchor.download = "talk_ai.png";
+
+  final body = html.document.body;
+  if (body == null) {
+    throw Exception("body is null");
+  }
+  body.append(anchor);
+  anchor.click();
+  anchor.remove();
+}
+
+Future<void> shareFile1(
   ByteData imageBytes,
 ) async {
   if (!kIsWeb) {
