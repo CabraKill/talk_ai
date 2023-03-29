@@ -13,7 +13,8 @@ class SendButton extends StatelessWidget {
   }) : _fieldDimension = fieldDimension;
 
   static const _riveAsset = "assets/rive/chat.riv";
-  
+  static const double _size = 52;
+
   final void Function({Function(String message)? onError})? onSendButtonTap;
   final double _fieldDimension;
   final bool isReady;
@@ -23,8 +24,8 @@ class SendButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1,
+    return SizedBox.square(
+      dimension: _size,
       child: GestureDetector(
         onTap: onSendButtonTap,
         child: Container(

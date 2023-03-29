@@ -161,36 +161,32 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            decoration: InputDecoration(
-                              border: outlineInputBorder,
-                              focusedBorder: outlineInputBorder,
-                              enabledBorder: outlineInputBorder,
-                              labelText: 'Message',
-                            ),
-                            maxLines: 5,
-                            minLines: 1,
-                            controller: controller.textController,
-                            onChanged: controller.onChanged,
-                            onSubmitted: (_) => controller.onSendMessage(
-                                onError: _showErrorSnackBar),
-                            textInputAction: TextInputAction.send,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            border: outlineInputBorder,
+                            focusedBorder: outlineInputBorder,
+                            enabledBorder: outlineInputBorder,
+                            labelText: 'Message',
                           ),
+                          controller: controller.textController,
+                          onChanged: controller.onChanged,
+                          onSubmitted: (_) => controller.onSendMessage(
+                              onError: _showErrorSnackBar),
+                          textInputAction: TextInputAction.send,
                         ),
-                        const SizedBox(width: 10),
-                        SendButton(
-                            onSendButtonTap: onSendButtonTap,
-                            fieldDimension: _fieldDimension,
-                            isReady: isReady,
-                            borderColor: borderColor,
-                            disabledBorderColor: disabledBorderColor,
-                            onInit: onInit),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 10),
+                      SendButton(
+                          onSendButtonTap: onSendButtonTap,
+                          fieldDimension: _fieldDimension,
+                          isReady: isReady,
+                          borderColor: borderColor,
+                          disabledBorderColor: disabledBorderColor,
+                          onInit: onInit),
+                    ],
                   ),
                 ],
               ),
