@@ -3,9 +3,13 @@ import 'dart:html' as html;
 import 'dart:js' as js;
 import 'package:flutter/foundation.dart';
 
-Future<void> shareFile(
+void shareFile(
   ByteData imageBytes,
-) async {
+) {
+  _openTab(imageBytes);
+}
+
+void _shareFile(ByteData imageBytes) {
   final uint8ListFromBytes = imageBytes.buffer.asUint8List();
   final base64 = base64Encode(uint8ListFromBytes);
   final anchor =
@@ -23,7 +27,7 @@ Future<void> shareFile(
   anchor.remove();
 }
 
-Future<void> shareFile1(
+Future<void> _shareFile1(
   ByteData imageBytes,
 ) async {
   if (!kIsWeb) {
@@ -43,7 +47,7 @@ Future<void> shareFile1(
   link.click();
 }
 
-void openTab(ByteData imageBytes) {
+void _openTab(ByteData imageBytes) {
   final uint8ListFromBytes = imageBytes.buffer.asUint8List();
   html.Blob imageBlob = html.Blob([uint8ListFromBytes], 'image/png');
 

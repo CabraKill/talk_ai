@@ -21,6 +21,8 @@ class ShareDialog extends StatefulWidget {
 }
 
 class _ShareDialogState extends State<ShareDialog> {
+    static const double _widthProportion = 0.8;
+
   final _globalKey = GlobalKey();
 
   Future<void> _onShare() async {
@@ -57,10 +59,10 @@ class _ShareDialogState extends State<ShareDialog> {
             ],
           ),
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         Flexible(
           child: Container(
-            width: MediaQuery.of(context).size.width * 0.8,
+            width: MediaQuery.of(context).size.width * _widthProportion,
             child: FittedBox(
               fit: BoxFit.cover,
               child: SharableContainer(

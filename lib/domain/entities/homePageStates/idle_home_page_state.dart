@@ -1,6 +1,9 @@
 import 'package:talk_ai/domain/entities/homePageStates/home_page_state.dart';
 
 class IdleHomePageState extends HomePageState {
+  @override
+  List<Object> get props => [];
+
   const IdleHomePageState({
     required super.messageList,
   });
@@ -10,7 +13,4 @@ class IdleHomePageState extends HomePageState {
   factory IdleHomePageState.fromState(HomePageState state) {
     return IdleHomePageState(messageList: state.messageList);
   }
-
-  @override
-  List<Object> get props => [];
 }
