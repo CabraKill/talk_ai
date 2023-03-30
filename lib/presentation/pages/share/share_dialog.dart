@@ -1,6 +1,5 @@
 import 'package:talk_ai/presentation/pages/share/share_file_non_web.dart'
     if (dart.library.html) 'package:talk_ai/presentation/pages/share/share_file_web.dart';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:talk_ai/presentation/pages/share/sharable_container.dart';
@@ -21,23 +20,17 @@ class ShareDialog extends StatefulWidget {
 }
 
 class _ShareDialogState extends State<ShareDialog> {
-    static const double _widthProportion = 0.8;
+  static const double _widthProportion = 0.8;
 
   final _globalKey = GlobalKey();
 
   Future<void> _onShare() async {
-    //TODO analyse this
-    // final boundary = SharableContainer(
-    //   botMessage: widget.botMessage,
-    //   userMessage: widget.userMessage,
-    // ).build(context).createElement().findRenderObject()
-    //     as RenderRepaintBoundary;
     final boundary =
         _globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary;
 
-    ui.Image image = await boundary.toImage();
+    final image = await boundary.toImage();
 
-    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     if (byteData == null) return;
     shareFile(byteData);
   }
@@ -52,9 +45,12 @@ class _ShareDialogState extends State<ShareDialog> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                "Preview",
-                style: Theme.of(context).textTheme.titleLarge,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Preview",
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
               ),
             ],
           ),
@@ -64,7 +60,7 @@ class _ShareDialogState extends State<ShareDialog> {
           child: Container(
             width: MediaQuery.of(context).size.width * _widthProportion,
             child: FittedBox(
-              fit: BoxFit.cover,
+              fit: BoxFit.scaleDown,
               child: SharableContainer(
                 userMessage: widget.userMessage,
                 botMessage: widget.botMessage,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:talk_ai/infra/colors/colors.dart';
+import 'package:talk_ai/infra/design/design_colors.dart';
 import 'package:talk_ai/infra/injections/injectable.dart';
 import 'package:talk_ai/infra/services/theme_service.dart';
 import 'package:talk_ai/presentation/pages/home_page.dart';
@@ -25,12 +25,12 @@ void main() {
             theme: ThemeData.light(
               useMaterial3: themeController.isDarkTheme,
             ).copyWith(
-              primaryColor: AppColors.grey,
+              primaryColor: DesignColors.grey,
             ),
             darkTheme: ThemeData.dark(
               useMaterial3: true,
             ).copyWith(
-              primaryColor: AppColors.cyan,
+              primaryColor: DesignColors.cyan,
             ),
             home: const HomePage(),
           );

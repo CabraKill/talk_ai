@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:talk_ai/infra/colors/colors.dart';
+import 'package:talk_ai/infra/design/design_colors.dart';
 import 'package:talk_ai/presentation/pages/home/widgets/bot_message.dart';
 import 'package:talk_ai/presentation/pages/home/widgets/user_message.dart';
 
 class SharableContainer extends StatelessWidget {
+  static const _source = "TalkAI - https://cabrakill.github.io/talk_ai/";
+
   const SharableContainer({
     super.key,
     required this.userMessage,
@@ -23,37 +25,45 @@ class SharableContainer extends StatelessWidget {
             constraints: const BoxConstraints(
               maxWidth: 500,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
+            child: Row(
               children: [
                 Flexible(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      UserMessage(
-                        message: userMessage,
+                      Flexible(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            UserMessage(
+                              message: userMessage,
+                            ),
+                            BotMessage(
+                              message: botMessage,
+                            )
+                          ],
+                        ),
                       ),
-                      BotMessage(
-                        message: botMessage,
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Text(
+                            _source,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                  fontStyle: FontStyle.italic,
+                                  color: DesignColors.cyan,
+                                ),
+                          ),
+                        ],
                       )
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text("TalkAI - https://cabrakill.github.io/talk_ai/",
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontStyle: FontStyle.italic,
-                              color: AppColors.cyan,
-                            )),
-                  ],
-                )
               ],
             ),
           ),

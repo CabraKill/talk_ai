@@ -49,9 +49,9 @@ Future<void> _shareFile1(
 
 void _openTab(ByteData imageBytes) {
   final uint8ListFromBytes = imageBytes.buffer.asUint8List();
-  html.Blob imageBlob = html.Blob([uint8ListFromBytes], 'image/png');
+  final imageBlob = html.Blob([uint8ListFromBytes], 'image/png');
 
-  String imageUrl = html.Url.createObjectUrl(imageBlob);
+  final imageUrl = html.Url.createObjectUrl(imageBlob);
 
   html.window.open(imageUrl, '_blank');
 }

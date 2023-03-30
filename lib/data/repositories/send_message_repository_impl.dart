@@ -13,8 +13,8 @@ class SendMessageRepositoryImpl {
 
   Future<MessageEntity> call(List<MessageEntity> messageList) async {
     const key = String.fromEnvironment('CHAT_API_KEY');
-    var messages = _messagesToAPI(messageList);
-    var body = <String, dynamic>{
+    final messages = _messagesToAPI(messageList);
+    final body = <String, dynamic>{
       "model": "gpt-3.5-turbo",
       "messages": messages,
     };

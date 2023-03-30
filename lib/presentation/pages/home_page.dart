@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:talk_ai/domain/entities/bot_message_stream_entity.dart';
 import 'package:talk_ai/domain/entities/homePageStates/idle_home_page_state.dart';
 import 'package:talk_ai/domain/entities/user_message_entity.dart';
+import 'package:talk_ai/infra/design/design_sizes.dart';
 import 'package:talk_ai/infra/services/theme_service.dart';
 import 'package:talk_ai/presentation/pages/home/widgets/bot_message.dart';
 import 'package:talk_ai/presentation/pages/home/widgets/bot_message_stream_builder.dart';
@@ -22,6 +23,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static const double _pagePadding = 8.0;
   static const double _fieldDimension = 52;
+
+  bool _expandChat = false;
 
   @override
   void initState() {
@@ -63,6 +66,12 @@ class _HomePageState extends State<HomePage> {
         botMessage: botMessage,
       ),
     );
+  }
+
+  void _onAnimationEnd() {
+    setState(() {
+      _expandChat = true;
+    });
   }
 
   @override
@@ -114,81 +123,97 @@ class _HomePageState extends State<HomePage> {
             final onSendButtonTap = isReady ? controller.onSendMessage : null;
             final onInit = controller.onInit;
 
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    fit: messageList.isEmpty ? FlexFit.loose : FlexFit.tight,
-                    child: SingleChildScrollView(
-                      reverse: true,
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: messageList
-                              .map(
-                                (messageEntity) =>
-                                    messageEntity is UserMessageEntity
-                                        ? UserMessage(
-                                            message: messageEntity.message,
-                                          )
-                                        : Row(
-                                            children: [
-                                              Expanded(
-                                                child: messageEntity
-                                                        is BotMessageStreamEntity
-                                                    ? BotMessageStreamBuilder(
-                                                        message: messageEntity,
-                                                      )
-                                                    : BotMessage(
-                                                        message: messageEntity
-                                                            .message,
-                                                      ),
-                                              ),
-                                              const SizedBox(width: 16),
-                                              IconButton(
-                                                icon: const Icon(Icons.share),
-                                                onPressed: () => controller
-                                                    .onShareTap(messageEntity, _share),
-                                              ),
-                                            ],
-                                          ),
-                              )
-                              .toList(),
+            final showEmptyLayout = messageList.isEmpty;
+
+            final expandChat = showEmptyLayout && _expandChat;
+
+            return AnimatedAlign(
+              alignment:
+                  showEmptyLayout ? Alignment.center : Alignment.bottomCenter,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOutCirc,
+              onEnd: _onAnimationEnd,
+              child: Container(
+                key: ValueKey('chat_container-$expandChat'),
+                constraints: BoxConstraints(
+                  maxWidth: DesignSizes.maxScreenContentWidth,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      fit: expandChat ? FlexFit.tight : FlexFit.loose,
+                      child: SingleChildScrollView(
+                        reverse: true,
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: messageList
+                                .map(
+                                  (messageEntity) => messageEntity
+                                          is UserMessageEntity
+                                      ? UserMessage(
+                                          message: messageEntity.message,
+                                        )
+                                      : Row(
+                                          children: [
+                                            Expanded(
+                                              child: messageEntity
+                                                      is BotMessageStreamEntity
+                                                  ? BotMessageStreamBuilder(
+                                                      message: messageEntity,
+                                                    )
+                                                  : BotMessage(
+                                                      message:
+                                                          messageEntity.message,
+                                                    ),
+                                            ),
+                                            const SizedBox(width: 16),
+                                            IconButton(
+                                              icon: const Icon(Icons.share),
+                                              onPressed: () =>
+                                                  controller.onShareTap(
+                                                      messageEntity, _share),
+                                            ),
+                                          ],
+                                        ),
+                                )
+                                .toList(),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          decoration: InputDecoration(
-                            border: outlineInputBorder,
-                            focusedBorder: outlineInputBorder,
-                            enabledBorder: outlineInputBorder,
-                            labelText: 'Message',
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            decoration: InputDecoration(
+                              border: outlineInputBorder,
+                              focusedBorder: outlineInputBorder,
+                              enabledBorder: outlineInputBorder,
+                              labelText: 'Message',
+                            ),
+                            controller: controller.textController,
+                            onChanged: controller.onChanged,
+                            onSubmitted: (_) => controller.onSendMessage(
+                                onError: _showErrorSnackBar),
+                            textInputAction: TextInputAction.send,
                           ),
-                          controller: controller.textController,
-                          onChanged: controller.onChanged,
-                          onSubmitted: (_) => controller.onSendMessage(
-                              onError: _showErrorSnackBar),
-                          textInputAction: TextInputAction.send,
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      SendButton(
-                          onSendButtonTap: onSendButtonTap,
-                          fieldDimension: _fieldDimension,
-                          isReady: isReady,
-                          borderColor: borderColor,
-                          disabledBorderColor: disabledBorderColor,
-                          onInit: onInit),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: 10),
+                        SendButton(
+                            onSendButtonTap: onSendButtonTap,
+                            fieldDimension: _fieldDimension,
+                            isReady: isReady,
+                            borderColor: borderColor,
+                            disabledBorderColor: disabledBorderColor,
+                            onInit: onInit),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             );
           }),

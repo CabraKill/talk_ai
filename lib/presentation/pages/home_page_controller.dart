@@ -59,7 +59,7 @@ class HomePageController extends ChangeNotifier {
   void onSendMessage({Function(String message)? onError}) {
     if (state is! IdleHomePageState) return;
     _messageSent = true;
-    var text = textController.text;
+    final text = textController.text;
     _sendMessageToAPI(text, onError: onError);
     textController.clear();
   }
@@ -77,7 +77,7 @@ class HomePageController extends ChangeNotifier {
     final indexOfBotMessage = messageList.indexOf(botMessageEntity);
     final userMessageEntity = messageList[indexOfBotMessage - 1];
     final botMessage = botMessageEntity.message;
-    var userMessage = userMessageEntity.message;
+    final userMessage = userMessageEntity.message;
     share(
       userMessage,
       botMessage,

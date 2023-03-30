@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:talk_ai/infra/colors/colors.dart';
+import 'package:talk_ai/infra/design/design_colors.dart';
 
 class InfoDialogItemWidget extends StatelessWidget {
   final IconData iconData;
@@ -20,7 +20,7 @@ class InfoDialogItemWidget extends StatelessWidget {
         children: [
           Icon(
             iconData,
-            color: AppColors.cyan,
+            color: DesignColors.cyan,
             size: 24,
           ),
           const SizedBox(width: 16),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:talk_ai/infra/design/design_sizes.dart';
 import 'package:talk_ai/presentation/pages/info/info_dialog_item_widget.dart';
 
 class ChatGPTDialog extends StatefulWidget {
@@ -17,7 +18,6 @@ class ChatGPTDialogState extends State<ChatGPTDialog>
   static const _language = 'You can write in your own language.';
   static const _data =
       'TalkAI uses ChatGPT, a language model trained by OpenAI, to generate answers to your questions.';
-  static const double _maxDialogWidth = 600;
 
   late final AnimationController _animationController;
   late final Animation<double> _animationAlign;
@@ -76,7 +76,7 @@ class ChatGPTDialogState extends State<ChatGPTDialog>
           insetPadding: const EdgeInsets.all(16.0),
           child: Container(
             constraints: BoxConstraints(
-              maxWidth: _maxDialogWidth,
+              maxWidth: DesignSizes.maxDialogWidth,
             ),
             padding: const EdgeInsets.all(16.0),
             child: Column(
