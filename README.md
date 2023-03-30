@@ -13,7 +13,7 @@ On the **Web** the stream response is not enabled but in Windows and Android pla
 ![chatgpt](./README/openai.webp)
 
 ## Chat Animation 🍥
-The chat animation was made with ![Rive](https://rive.app/). The animation uses a simple circle with the *State Machine* to make the app more beautiful and fun. The fluid transition between states is a result of this technology.
+The chat animation was made with [Rive](https://rive.app/). The animation uses a simple circle with the *State Machine* to make the app more beautiful and fun. The fluid transition between states is a result of this technology.
 
 ## Contributing 🫰
 Contributions are welcome! Feel free to open an issue or a pull request.
