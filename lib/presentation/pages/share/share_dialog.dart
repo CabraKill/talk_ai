@@ -32,7 +32,7 @@ class _ShareDialogState extends State<ShareDialog> {
 
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     if (byteData == null) return;
-    shareFile(byteData);
+    shareFile(context, byteData);
   }
 
   @override
